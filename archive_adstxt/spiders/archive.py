@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 
 import json
 import logging
+import csv
 
 
 class ArchiveSpider(Spider):
@@ -16,22 +17,30 @@ class ArchiveSpider(Spider):
     start_urls = ['https://web.archive.org/']
     maximum_reviews = 20
 
-    domains = ['hln_be', 'Ppcorn.com']
-
     def __init__(self, input_file, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.input_file = input_file
 
     def start_requests(self):
         search_url = "https://web.archive.org/__wb/sparkline?"
-        with open('input_test.csv') as domains_file:
-            for domain in domains_file:
-                query = {'url': domain.strip() + '/ads.txt',
-                         'collection': 'web',
-                         'output': 'json'}
-                yield Request(search_url + urlencode(query),
-                              callback=self.parse_search,
-                              meta={'domain': domain})
+        list_domains = set()
+        with open(self.input_file) as domains_file:
+            reader = csv.reader(domains_file)
+            next(reader)
+            for row in reader:
+                logging.debug(f"row is {row}")
+                #split_row = row[0].split(',')
+                domain = row[0]
+                direct = row[3]
+                if direct == 'DIRECT' and domain not in list_domains:
+                    list_domains.add(domain)
+                    query = {'url': domain.strip() + '/ads.txt',
+                             'collection': 'web',
+                             'output': 'json'}
+                    yield Request(search_url + urlencode(query),
+                                  callback=self.parse_search,
+                                  meta={'domain': domain})
+                    logging.info(f"{domain}")
 
     def parse_search(self, response):
         result = json.loads(response.text)
