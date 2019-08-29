@@ -16,7 +16,7 @@ class ArchiveAdstxtPipeline(object):
 
     def open_spider(self, spider):
         self.filename = "test_output.csv"
-        self.file = open(self.filename + '_' + str(self.counter), 'w')
+        self.file = open(self.filename)
         self.writer = csv.writer(self.file)
         self.writer.writerow(["domain"])
 
@@ -24,9 +24,6 @@ class ArchiveAdstxtPipeline(object):
         self.counter += 1
         domain = item['domain']
         self.writer.writerow([domain])
-        if self.counter % 5000 == 0:
-            self.file.close()
-            self.file = open(self.filename + '_' + str(self.counter), 'w')
         return item
 
     def close_spider(self, spider):
