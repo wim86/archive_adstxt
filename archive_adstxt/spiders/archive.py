@@ -31,7 +31,10 @@ class ArchiveSpider(Spider):
                 logging.debug(f"row is {row}")
                 #split_row = row[0].split(',')
                 domain = row[0]
-                direct = row[3]
+                try:
+                    direct = row[3]
+                except IndexError:
+                    direct = 'DIRECT'
                 if direct == 'DIRECT' and domain not in list_domains:
                     list_domains.add(domain)
                     query = {'url': domain.strip() + '/ads.txt',
