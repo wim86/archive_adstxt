@@ -16,7 +16,7 @@ class ArchiveAdstxtPipeline(object):
 
     def open_spider(self, spider):
         self.filename = "test_output.csv"
-        self.file = open(self.filename)
+        self.file = open(self.filename, 'w')
         self.writer = csv.writer(self.file)
         self.writer.writerow(["domain"])
 
